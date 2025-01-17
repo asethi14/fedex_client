@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First HTML Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        .header{
+            padding: 10px;
+        }
+        
+        .blue_head{
+        
+            color: #4D148C;
+            padding: 15px 10px;
+        }
+        .homeIcon{
+            display: inline;
+            color: #4D148C;
+            font-size: 42px;
+            cursor: pointer;
+        }
+        #content{
+            width: 100%;
+            height: auto;
+        }
+        
+        #tree-container{
+            padding: 5px;
+            background-color: #4D148C;
+            height: 600px;
+            color: #fff;
+        }
+        
+        #tree-container > mat-tree > mat-tree-node{
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            background-color: #4D148C;
+            color: #FFFFFF;
+        }
+        
+        #tree-container > mat-tree :hover{
+            cursor: pointer;
+            background-color: #FF6200;
+            color:#FFFFFF; ;
+        }
+        #tree-container > mat-tree .active{
+            background-color: #FF6200;
+            color:#FFFFFF;
+        }
+        
+        .homeLabel{
+            text-decoration: underline;
+            font-size: 20px;
+            font-weight: bold;
+            color: #4D148C;
+        }
+        .homeLabel:hover{
+            cursor: pointer;
+        }
+        .expandable:before {
+            content: '▼';
+            margin-right: 5px;
+            font-size: 15px;
+        }
+        .collapsed:before {
+            content: '►';
+            margin-right: 5px;
+            font-size: 20px;
+        }
+        ul, li {
+            list-style: none;
+            line-height: 3;
+        }
+        .nestedList.show {
+            display: block;
+        }
+        /* Style for the tiles container */
+        .tile-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            width: 90%;
+        }
+
+        /* Style for individual tiles */
+        .tile {
+            border: 2px solid #4D148C;
+            padding: 35px;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .tile:hover {
+            transform: scale(1.05);
+            background-color: #4D148C;
+        }
+
+        .tile h3 {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .tile p {
+            font-size: 14px;
+            color: #666;
+        }
+        .tile:hover p {
+            font-size: 14px;
+            color: #fff;
+        }
+        .noshow {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="row g-0">
+        <!-- left nav -->
+        <div class="col-md-3">
+          <!-- tree navigation -->
+          <div id="tree-container">
+            <ul>
+                <li class="expandable" onclick="toggleTree(this, event);generateTiles(this)">
+                    Supply chain operations
+                    <ul class="nestedList show">
+                        <li>Global Operations Solutions</li>
+                        <li>Global Operations Shipments</li>
+                        <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">
+                            <span onclick="showClearance(event)">Clearance & supply chain</span>
+                            <ul class="nestedList noshow">
+                                <li>Admissibility</li>
+                                <li>Brokerage</li>
+                                <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">Clearance
+                                    <ul class="nestedList noshow">
+                                        <li>CBS</li>
+                                        <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">Classify
+                                            <ul class="nestedList noshow">
+                                                <li onclick="showClassDiag()">Class Diagram</li>
+                                                <li onclick="showArchDiag()">Arch Diagram</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>Planning</li>
+                    </ul>
+                </li>
+            </ul>
+          </div>
+        </div>
+        <!-- end of left nav -->
+        <!-- main container -->
+        <div class="col-md-9">
+          <div class="row g-0">
+            <div class="col-md-9 blue_head">
+              <h2>Interactive Architectural Diagram</h2>
+            </div>
+            <div class="col-md-3">
+                <div class="header">
+                  <img alt="" src="./assets/images/logo.png"/>
+                </div>
+            </div>
+            <hr>
+            <!-- Container for dynamically generated tiles -->
+            <div class="tile-container" id="tileContainer">
+                <!-- Tiles will be inserted here dynamically -->
+            </div>
+            <div class="clearanceDiv noshow">
+                <img alt="" src="./assets/images/clearance.png"/>
+            </div>
+            <div class="classDiag noshow">
+                <img alt="" src="./assets/images/class_diagram.png"/>
+            </div>
+            <div class="archDiag noshow">
+                <img alt="" src="./assets/images/arch_diagram.png"/>
+            </div>
+          </div>          
+        </div>
+        <!-- end of main container -->
+      </div>
+</body>
+<footer>
+    <script>
+        function toggleTree(element, event) {
+            const nestedList = element.querySelector('ul');
+            const isCollapsed = nestedList && nestedList.classList.contains('noshow');
+            
+            if (nestedList) {
+                nestedList.classList.toggle('noshow');
+                nestedList.classList.toggle('show');
+                element.classList.toggle('collapsed', !isCollapsed);
+                element.classList.toggle('expandable', isCollapsed);
+            }
+            event.stopPropagation();
+        }
+        // Function to generate tiles based on selected category
+        function generateTiles(element) {
+            // Clear previous tiles
+            tileContainer.innerHTML = '';
+
+            // Get the data for the selected category
+            const nestedList = element.querySelector('ul');
+
+            if (!nestedList) {
+                tileContainer.innerHTML = '<p>Coming Soon...</p>';
+                return;
+            }
+
+            const immediateLiChildren = nestedList.querySelectorAll(':scope > li');;
+
+            // Create a tile for each item in the category
+            for(let i = 0; i < immediateLiChildren.length; i++) {
+                const child = immediateLiChildren[i];
+                const tile = document.createElement('div');
+                tile.classList.add('tile');
+                
+                // Create content for the tile
+                tile.innerHTML = `
+                    
+                    <p>${child.innerText}</p>
+                `;
+
+                // Append the tile to the container
+                tileContainer.appendChild(tile);
+            }
+            event.stopPropagation();
+        }
+        window.onload = function() {
+            // Select the first <li> element that is part of a parent <ul>
+            const firstListItem = document.querySelector('li.expandable');
+
+            if (firstListItem) {
+                // Call the generateTiles function of the first <li>
+                generateTiles(firstListItem);
+            }
+        };
+        function showClearance(event) {
+            const element = document.querySelector('.clearanceDiv');
+            const tileDiv = document.querySelector('.tile-container');
+            tileDiv.classList.toggle('noshow');
+            element.classList.toggle('noshow');
+            element.classList.toggle('show');            
+            event.stopPropagation();
+        }
+        function showClassDiag() {
+            const element = document.querySelector('.clearanceDiv');
+            const tileDiv = document.querySelector('.tile-container');
+            const classDiag = document.querySelector('.classDiag');
+            tileDiv.classList.toggle('noshow');
+            element.classList.toggle('noshow');
+            classDiag.classList.toggle('noshow');
+            classDiag.classList.toggle('show');            
+            event.stopPropagation();
+        }
+        function showArchDiag() {
+            const element = document.querySelector('.clearanceDiv');
+            const tileDiv = document.querySelector('.tile-container');
+            const classDiag = document.querySelector('.classDiag');
+            const archDiag = document.querySelector('.classDiag');
+            tileDiv.classList.toggle('noshow', true);
+            element.classList.toggle('noshow', true);
+            classDiag.classList.toggle('noshow', true);
+            archDiag.classList.toggle('show', true);            
+            event.stopPropagation();
+        }
+    </script>
+</footer>
+</html>
