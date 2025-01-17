@@ -128,6 +128,12 @@
             font-family: Arial, sans-serif;
             padding: 20px;
         }
+        button {
+            border-style: none;
+            padding: 7px;
+            margin: 12px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
     </style>
 </head>
 <body>
@@ -137,13 +143,13 @@
           <!-- tree navigation -->
           <div id="tree-container">
             <ul>
-                <li class="expandable" onclick="toggleTree(this, event);generateTiles(this)">
+                <li id="supplyChainOps" class="expandable" onclick="toggleTree(this, event);generateTiles(this)">
                     Supply chain operations
                     <ul class="nestedList show">
                         <li onclick="showComingSoon()">Global Operations Solutions</li>
                         <li onclick="showComingSoon()">Global Operations Shipments</li>
                         <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">
-                            <span onclick="showClearance(event)">Clearance & supply chain</span>
+                            <span onclick="showClearance(event)">Clearance & Supply Chain</span>
                             <ul class="nestedList noshow">
                                 <li onclick="showComingSoon()">Admissibility</li>
                                 <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">Brokerage
@@ -182,6 +188,9 @@
                 </div>
             </div>
             <hr>
+            <div class="backDiv">
+                <button onclick="back()">Back</button>
+            </div>
             <!-- Container for dynamically generated tiles -->
             <div class="tile-container" id="tileContainer">
                 <!-- Tiles will be inserted here dynamically -->
@@ -255,8 +264,11 @@
 
                     // Add a click event listener to the tile
                     tile.addEventListener('click', function() {
-                        childNode.click();
-                        // You can replace this alert with any custom functionality
+                        if(childNode.innerText.trim() == "Clearance & Supply Chain") {
+                            showClearance();
+                        } else {
+                            childNode.click();
+                        }
                     });
 
                     // Append the tile to the container
@@ -280,11 +292,13 @@
             const classDiag = document.querySelector('.classDiag');
             const archDiag = document.querySelector('.archDiag');
             const comingSoon = document.querySelector('.comingSoon');
+            const backDiv = document.querySelector('.backDiv');
             element.classList.add('noshow');
             tileDiv.classList.add('noshow');
             classDiag.classList.add('noshow');
             archDiag.classList.add('noshow');
             comingSoon.classList.add('noshow');
+            backDiv.classList.add('noshow');
         }
         function showClearance(event) {
             hideAllDivs();
@@ -311,8 +325,14 @@
             hideAllDivs();
             const comingSoon = document.querySelector('.comingSoon');
             comingSoon.classList.toggle('noshow');
-            comingSoon.classList.toggle('show');            
+            comingSoon.classList.toggle('show'); 
+            const backDiv = document.querySelector('.backDiv');
+            backDiv.classList.toggle('noshow');
+            backDiv.classList.toggle('show');              
             event.stopPropagation();
+        }
+        function back() {
+            location.reload(true);
         }
     </script>
 </footer>
