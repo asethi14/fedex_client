@@ -29,7 +29,7 @@
         #tree-container{
             padding: 5px;
             background-color: #4D148C;
-            height: 600px;
+            height: 100vh;
             color: #fff;
         }
         
@@ -72,7 +72,9 @@
         ul, li {
             list-style: none;
             line-height: 3;
+            cursor: pointer;
         }
+        
         .nestedList.show {
             display: block;
         }
@@ -91,6 +93,7 @@
             padding: 35px;
             text-align: center;
             border-radius: 8px;
+            cursor: pointer;
         }
 
         .tile:hover {
@@ -114,6 +117,17 @@
         .noshow {
             display: none;
         }
+        .clearanceDiv, .classDiag, .archDiag {
+            padding: 20px;
+        }
+        .classDiag img, .archDiag img {
+            width: inherit;
+        }
+        .comingSoon {
+            font-size: 30px;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -126,16 +140,14 @@
                 <li class="expandable" onclick="toggleTree(this, event);generateTiles(this)">
                     Supply chain operations
                     <ul class="nestedList show">
-                        <li>Global Operations Solutions</li>
-                        <li>Global Operations Shipments</li>
+                        <li onclick="showComingSoon()">Global Operations Solutions</li>
+                        <li onclick="showComingSoon()">Global Operations Shipments</li>
                         <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">
                             <span onclick="showClearance(event)">Clearance & supply chain</span>
                             <ul class="nestedList noshow">
-                                <li>Admissibility</li>
-                                <li>Brokerage</li>
-                                <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">Clearance
+                                <li onclick="showComingSoon()">Admissibility</li>
+                                <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">Brokerage
                                     <ul class="nestedList noshow">
-                                        <li>CBS</li>
                                         <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">Classify
                                             <ul class="nestedList noshow">
                                                 <li onclick="showClassDiag()">Class Diagram</li>
@@ -144,9 +156,14 @@
                                         </li>
                                     </ul>
                                 </li>
+                                <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">Clearance
+                                    <ul class="nestedList noshow">
+                                        <li onclick="showComingSoon()">CBS</li>
+                                    </ul>
+                                </li>
                             </ul>
                         </li>
-                        <li>Planning</li>
+                        <li onclick="showComingSoon()">Planning</li>
                     </ul>
                 </li>
             </ul>
@@ -169,13 +186,20 @@
             <div class="tile-container" id="tileContainer">
                 <!-- Tiles will be inserted here dynamically -->
             </div>
-            <div class="clearanceDiv noshow">
-                <img alt="" src="./assets/images/clearance.png"/>
+            <div class="comingSoon">
+                <span>Coming Soon...</span>
             </div>
-            <div class="classDiag noshow">
+            <div class="clearanceDiv">
+                <img alt="" src="./assets/images/clearance.png" usemap="#image-map"/>
+                <map _ngcontent-ktc-c5="" name="image-map">
+                    <area target="_self" alt="classify" title="classify" onclick="showClassDiag()" coords="192,168,276,213" shape="rect" style="cursor: pointer;">
+                    <area target="_self" alt="CBS" title="CBS" onclick="showComingSoon()" coords="524,206,460,167" shape="rect" style="cursor: pointer;">
+                </map>
+            </div>
+            <div class="classDiag">
                 <img alt="" src="./assets/images/class_diagram.png"/>
             </div>
-            <div class="archDiag noshow">
+            <div class="archDiag">
                 <img alt="" src="./assets/images/arch_diagram.png"/>
             </div>
           </div>          
@@ -199,8 +223,16 @@
         }
         // Function to generate tiles based on selected category
         function generateTiles(element) {
+            hideAllDivs();
+            tileContainer.classList.toggle('noshow');
+            tileContainer.classList.toggle('show');
+
             // Clear previous tiles
             tileContainer.innerHTML = '';
+
+            if(element.classList.contains('collapsed')) {
+                element = element.parentNode.parentNode;
+            }
 
             // Get the data for the selected category
             const nestedList = element.querySelector('ul');
@@ -210,23 +242,27 @@
                 return;
             }
 
-            const immediateLiChildren = nestedList.querySelectorAll(':scope > li');;
-
-            // Create a tile for each item in the category
-            for(let i = 0; i < immediateLiChildren.length; i++) {
-                const child = immediateLiChildren[i];
-                const tile = document.createElement('div');
-                tile.classList.add('tile');
-                
-                // Create content for the tile
-                tile.innerHTML = `
+            nestedList.childNodes.forEach(function(childNode) {
+                if(childNode.tagName === 'LI' && !childNode.parentNode.classList.contains('noshow')) {
+                    const tile = document.createElement('div');
+                    tile.classList.add('tile');
                     
-                    <p>${child.innerText}</p>
-                `;
+                    // Create content for the tile
+                    tile.innerHTML = `
+                        
+                        <p>${childNode.innerText}</p>
+                    `;
 
-                // Append the tile to the container
-                tileContainer.appendChild(tile);
-            }
+                    // Add a click event listener to the tile
+                    tile.addEventListener('click', function() {
+                        childNode.click();
+                        // You can replace this alert with any custom functionality
+                    });
+
+                    // Append the tile to the container
+                    tileContainer.appendChild(tile);
+                }
+            });
             event.stopPropagation();
         }
         window.onload = function() {
@@ -238,33 +274,44 @@
                 generateTiles(firstListItem);
             }
         };
-        function showClearance(event) {
+        function hideAllDivs() {
             const element = document.querySelector('.clearanceDiv');
             const tileDiv = document.querySelector('.tile-container');
-            tileDiv.classList.toggle('noshow');
+            const classDiag = document.querySelector('.classDiag');
+            const archDiag = document.querySelector('.archDiag');
+            const comingSoon = document.querySelector('.comingSoon');
+            element.classList.add('noshow');
+            tileDiv.classList.add('noshow');
+            classDiag.classList.add('noshow');
+            archDiag.classList.add('noshow');
+            comingSoon.classList.add('noshow');
+        }
+        function showClearance(event) {
+            hideAllDivs();
+            const element = document.querySelector('.clearanceDiv');
             element.classList.toggle('noshow');
             element.classList.toggle('show');            
             event.stopPropagation();
         }
         function showClassDiag() {
-            const element = document.querySelector('.clearanceDiv');
-            const tileDiv = document.querySelector('.tile-container');
+            hideAllDivs();
             const classDiag = document.querySelector('.classDiag');
-            tileDiv.classList.toggle('noshow');
-            element.classList.toggle('noshow');
             classDiag.classList.toggle('noshow');
             classDiag.classList.toggle('show');            
             event.stopPropagation();
         }
         function showArchDiag() {
-            const element = document.querySelector('.clearanceDiv');
-            const tileDiv = document.querySelector('.tile-container');
-            const classDiag = document.querySelector('.classDiag');
-            const archDiag = document.querySelector('.classDiag');
-            tileDiv.classList.toggle('noshow', true);
-            element.classList.toggle('noshow', true);
-            classDiag.classList.toggle('noshow', true);
-            archDiag.classList.toggle('show', true);            
+            hideAllDivs();
+            const archDiag = document.querySelector('.archDiag');
+            archDiag.classList.toggle('noshow');
+            archDiag.classList.toggle('show');            
+            event.stopPropagation();
+        }
+        function showComingSoon() {
+            hideAllDivs();
+            const comingSoon = document.querySelector('.comingSoon');
+            comingSoon.classList.toggle('noshow');
+            comingSoon.classList.toggle('show');            
             event.stopPropagation();
         }
     </script>
