@@ -311,7 +311,15 @@
             hideAllDivs();
             const classDiag = document.querySelector('.classDiag');
             classDiag.classList.toggle('noshow');
-            classDiag.classList.toggle('show');            
+            classDiag.classList.toggle('show');
+            const lis = document.querySelectorAll('li.collapsed');
+            lis.forEach(function(li){
+                const ele = li.querySelector('.noshow');
+                ele.classList.toggle('noshow');
+                ele.classList.toggle('show');
+                li.classList.toggle('collapsed');
+                li.classList.toggle('expandable');
+            });
             event.stopPropagation();
         }
         function showArchDiag() {
