@@ -148,13 +148,16 @@
                     <ul class="nestedList show">
                         <li onclick="showComingSoon()">Global Operations Solutions</li>
                         <li onclick="showComingSoon()">Global Operations Shipments</li>
-                        <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">
+                        <li id="ClearSupplyChain" class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">
                             <span onclick="showClearance(event)">Clearance & Supply Chain</span>
+                            <input type="hidden" class="ClearSupplyChain" value="Clearance & Supply Chain"/>
                             <ul class="nestedList noshow">
                                 <li onclick="showComingSoon()">Admissibility</li>
-                                <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">Brokerage
+                                <li id="brokerage" class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">Brokerage
+                                    <input type="hidden" class="brokerage" value="Brokerage"/>
                                     <ul class="nestedList noshow">
-                                        <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">Classify
+                                        <li id="classify" class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">Classify
+                                            <input type="hidden" class="classify" value="Classify"/>
                                             <ul class="nestedList noshow">
                                                 <li onclick="showClassDiag()">Class Diagram</li>
                                                 <li onclick="showArchDiag()">Arch Diagram</li>
@@ -162,7 +165,8 @@
                                         </li>
                                     </ul>
                                 </li>
-                                <li class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">Clearance
+                                <li id="clearnce" class="collapsed" onclick="toggleTree(this, event);generateTiles(this)">Clearance
+                                    <input type="hidden" class="clearnce" value="Clearance"/>
                                     <ul class="nestedList noshow">
                                         <li onclick="showComingSoon()">CBS</li>
                                     </ul>
@@ -255,11 +259,15 @@
                 if(childNode.tagName === 'LI' && !childNode.parentNode.classList.contains('noshow')) {
                     const tile = document.createElement('div');
                     tile.classList.add('tile');
+                    let text = childNode.innerText;
+                    if(childNode.id != "" && document.querySelector("." + childNode.id) != null) {
+                        text = document.querySelector("." + childNode.id).value;
+                    }
                     
                     // Create content for the tile
                     tile.innerHTML = `
                         
-                        <p>${childNode.innerText}</p>
+                        <p>${text}</p>
                     `;
 
                     // Add a click event listener to the tile
